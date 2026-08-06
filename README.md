@@ -43,7 +43,7 @@ Download `Lingua-v1.0.0.apk` from the [Releases](../../releases) section and ins
 ### Option B - Run with VS Code
 
 1. Install [Flutter](https://docs.flutter.dev/get-started/install) and the **Flutter** extension in VS Code
-2. Open the project folder: `File → Open Folder → C:\Users\kokny\Documents\Github File\Lingua`
+2. Open the project folder in VS Code: `File → Open Folder`
 3. Connect an Android device (USB debugging) or start an Android emulator
 4. Press `F5` (or the **Run ▸ Start Debugging** menu) with `lib/main.dart` open
 5. Alternatively, run `flutter run` in the terminal
