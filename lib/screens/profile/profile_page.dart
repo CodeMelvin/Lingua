@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -22,48 +21,12 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       profileImage = File(picked.path);
     });
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    try {
-      final ref = FirebaseStorage.instance
-          .ref('profile_photos/${user.uid}.jpg');
-      await ref.putFile(File(picked.path));
-      final url = await ref.getDownloadURL();
-      await user.updatePhotoURL(url);
-      await user.reload();
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile photo updated.")),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Failed to upload photo: ${e.toString().split(':').first}",
-          ),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
-  }
-
-  ImageProvider? _resolveAvatar(String? photo) {
-    if (profileImage != null) return FileImage(profileImage!);
-    if (photo != null && photo.startsWith('http')) {
-      return NetworkImage(photo);
-    }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final email = user?.email ?? "No Email";
-    final photo = user?.photoURL;
 
     return Scaffold(
       appBar: AppBar(
@@ -109,10 +72,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 55,
-                      backgroundImage: _resolveAvatar(photo),
+                      backgroundImage: profileImage != null
+                          ? FileImage(profileImage!)
+                          : null,
                       backgroundColor: Colors.grey.shade400,
-                      child: (profileImage == null &&
-                              (photo == null || !photo.startsWith('http')))
+                      child: profileImage == null
                           ? const Icon(
                               Icons.person,
                               size: 55,
