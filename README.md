@@ -69,7 +69,7 @@ The app currently points to the owner's Firebase project (`android/app/google-se
 3. In **Authentication → Sign-in method**, enable **Email/Password**
 4. In **Realtime Database**, create a database and paste the security rules (below)
 5. Optionally import the data (nodes: `language`, `quiz`, `accounts`, `user_scores`) or seed `language`/`quiz` yourself
-6. Update the Firebase values in `lib/firebase_options.dart` (apiKey, appId, projectId, databaseURL, messagingSenderId) to match your project
+6. Update the Firebase values in `lib/firebase_options.dart` (apiKey, appId, projectId, databaseURL, messagingSenderId) to match your project, and make sure `android/app/google-services.json` includes the Realtime Database URL under `services.firebase_database.firebase_database_url` (both must point to the same database)
 
 **Recommended Realtime Database rules:**
 
