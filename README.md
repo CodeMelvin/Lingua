@@ -78,14 +78,28 @@ flutter build apk --release       # build the release APK
 
 ## 🗄️ Using Your Own Firebase Database
 
-The app points to the owner's Firebase project (`android/app/google-services.json` + `lib/firebase_options.dart`). To use **your own** Firebase backend:
+The app's Firebase credentials are **not committed** to this repository — they are injected at build time via `--dart-define` (see `lib/firebase_options.dart`). To point the app at **your own** Firebase backend:
 
-1. Create a project at [Firebase Console](https://console.firebase.google.com/) and add an **Android app** with package name `com.codemelvin.lingua`
-2. Download the generated `google-services.json` and replace `android/app/google-services.json`
-3. In **Authentication → Sign-in method**, enable **Email/Password**
-4. In **Realtime Database**, create a database and apply the security rules from [`firebase.rules.json`](firebase.rules.json)
-5. Optionally import the data (nodes: `language`, `quiz`, `accounts`, `user_scores`) or seed `language`/`quiz` yourself
-6. Update the Firebase values in `lib/firebase_options.dart` (apiKey, appId, projectId, databaseURL, messagingSenderId) to match your project, and make sure `android/app/google-services.json` includes the Realtime Database URL under `services.firebase_database.firebase_database_url` (both must point to the same database)
+**Option A — recommended (FlutterFire CLI):**
+
+1. Install the CLI: `dart pub global activate flutterfire_cli`
+2. Create a project at [Firebase Console](https://console.firebase.google.com/) and add an **Android app** with package name `com.codemelvin.lingua`
+3. Run `flutterfire configure` from the project root and select your project — this regenerates `lib/firebase_options.dart` and `android/app/google-services.json` with your values
+4. In **Authentication → Sign-in method**, enable **Email/Password**
+5. In **Realtime Database**, create a database and apply the security rules from [`firebase.rules.json`](firebase.rules.json)
+6. Optionally import the data (nodes: `language`, `quiz`, `accounts`, `user_scores`) or seed `language`/`quiz` yourself
+
+**Option B — build-time environment variables:**
+
+Pass your own project values when building:
+
+```
+flutter build apk --dart-define=FIREBASE_ANDROID_API_KEY=... --dart-define=FIREBASE_ANDROID_APP_ID=... --dart-define=FIREBASE_PROJECT_ID=... --dart-define=FIREBASE_DATABASE_URL=... --dart-define=FIREBASE_MESSAGING_SENDER_ID=...
+```
+
+(Web builds use `FIREBASE_WEB_API_KEY` / `FIREBASE_WEB_APP_ID` / `FIREBASE_WEB_MEASUREMENT_ID`.) This keeps credentials out of the source tree entirely — convenient for CI or hosting platforms like Vercel, where secrets live in environment variables.
+
+> **Note:** `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, `macos/Runner/GoogleService-Info.plist`, and `firebase.json` are git-ignored and never pushed.
 
 The security rules live in **`firebase.rules.json`** at the project root. They keep user data isolated: a user can only read and write their own account and score records, while the admin role is assigned manually in the Firebase Console. Users cannot promote themselves.
 
