@@ -1,24 +1,41 @@
 # 📖 Lingua
 
-> A Flutter language learning app with a vocabulary dictionary, English–Indonesian translator, and interactive quizzes.
+> A Flutter language learning app with a vocabulary dictionary, an English–Indonesian translator, and interactive quizzes.
+
+## 📸 Screenshots
+
+| Login | Register | Home |
+|---|---|---|
+| <img src="screenshots/login.png" width="220"/> | <img src="screenshots/register.png" width="220"/> | <img src="screenshots/home.png" width="220"/> |
+
+| Dictionary | Translate | Quiz |
+|---|---|---|
+| <img src="screenshots/dictionary.png" width="220"/> | <img src="screenshots/translate.png" width="220"/> | <img src="screenshots/quiz.png" width="220"/> |
+
+| Quiz Question | Profile |
+|---|---|
+| <img src="screenshots/question.png" width="220"/> | <img src="screenshots/profile.png" width="220"/> |
+
+---
 
 ## ✨ Features
 
-- 🗣️ **Vocabulary Dictionary** — browse everyday words with English–Indonesian translations and search
-- 🌐 **Translator** — translate text between English and Indonesian (with text-to-speech)
-- 🧠 **Quizzes** — multiple-choice quizzes in `en_to_id` and `id_to_en` directions
-- 📊 **User Scores** — per-user quiz history with score tracking
-- 🔐 **Accounts** — sign up, sign in, and reset your password (Firebase Authentication)
-- ⚙️ **Admin Dashboard** — manage quiz questions and view all user scores (admin role)
-- 🖼️ **Profile Photo** — pick a photo from gallery or camera (session only)
+- 🔐 **Authentication** — sign up, sign in, and password reset with role-based access (user / admin)
+- 📖 **Vocabulary Dictionary** — browse everyday words with English–Indonesian translations and real-time search
+- 🌐 **Translator** — translate text between English and Indonesian with text-to-speech and a list of available words
+- 🧠 **Quizzes** — multiple-choice quizzes in both `EN → ID` and `ID → EN` directions with instant feedback
+- 📊 **Score Tracking** — per-user quiz history and scores (admin can view all results)
+- ⚙️ **Admin Panel** — manage quiz questions and view user scores (admin role)
+- 🖼️ **Profile Photo** — set a profile photo from the gallery or camera (session only)
 
 ---
 
 ## 🛠️ Built With
 
 - 🟣 **Flutter** — cross-platform UI framework (Dart)
-- 🔥 **Firebase** — Authentication (Email/Password), Realtime Database
-- 🗄️ **flutter_tts** — text-to-speech for pronunciation
+- 🔥 **Firebase** — Authentication (Email/Password) and Realtime Database
+- 🗣️ **flutter_tts** — text-to-speech for pronunciation
+- 📷 **image_picker** — profile photo from gallery/camera
 
 ---
 
@@ -28,9 +45,7 @@
 |---|---|---|---|
 | User | `demo@lingua.app` | `demo123` | Browse dictionary, take quizzes, view own scores |
 
-> You can also register a new account from the **Register** screen (role: user).
->
-> ⚠️ The demo account is a **regular user** — with the published database rules it can only read the dictionary/quiz and write its **own** score. It cannot read other users' data, delete or edit quiz questions, or modify any other data.
+You can also register a new account from the **Register** screen (role: user).
 
 ---
 
@@ -47,8 +62,9 @@ Download `Lingua-v1.0.0.apk` from the [Releases](../../releases) section and ins
 3. Connect an Android device (USB debugging) or start an Android emulator
 4. Press `F5` (or the **Run ▸ Start Debugging** menu) with `lib/main.dart` open
 5. Alternatively, run `flutter run` in the terminal
+6. Create a new account from the **Register** screen (role: user)
 
-> 💡 Lingua is an Android-first app (Firebase config is set for Android). On web/desktop the Firebase settings are placeholders.
+> 💡 Lingua is fully cross-platform: Firebase is configured for **Android**, **Web**, **iOS**, and **macOS** (single project). On Android use an emulator/device; for the web version pick Chrome/Edge in VS Code (`flutter run -d chrome`).
 
 ### Option C - Build from the command line
 
@@ -62,73 +78,42 @@ flutter build apk --release       # build the release APK
 
 ## 🗄️ Using Your Own Firebase Database
 
-The app currently points to the owner's Firebase project (`android/app/google-services.json` + `lib/firebase_options.dart`). To use **your own** Firebase backend:
+The app points to the owner's Firebase project (`android/app/google-services.json` + `lib/firebase_options.dart`). To use **your own** Firebase backend:
 
 1. Create a project at [Firebase Console](https://console.firebase.google.com/) and add an **Android app** with package name `com.codemelvin.lingua`
 2. Download the generated `google-services.json` and replace `android/app/google-services.json`
 3. In **Authentication → Sign-in method**, enable **Email/Password**
-4. In **Realtime Database**, create a database and paste the security rules (below)
+4. In **Realtime Database**, create a database and apply the security rules from [`firebase.rules.json`](firebase.rules.json)
 5. Optionally import the data (nodes: `language`, `quiz`, `accounts`, `user_scores`) or seed `language`/`quiz` yourself
 6. Update the Firebase values in `lib/firebase_options.dart` (apiKey, appId, projectId, databaseURL, messagingSenderId) to match your project, and make sure `android/app/google-services.json` includes the Realtime Database URL under `services.firebase_database.firebase_database_url` (both must point to the same database)
 
-**Recommended Realtime Database rules:**
-
-```json
-{
-  "rules": {
-    "accounts": {
-      ".read": "auth != null && root.child('accounts').child(auth.uid).child('role').val() == 'admin'",
-      "$uid": {
-        ".read": "auth != null && auth.uid == $uid",
-        ".write": "auth != null && auth.uid == $uid && newData.child('role').val() == 'user'"
-      }
-    },
-    "language": {
-      ".read": "auth != null",
-      ".write": "auth != null && root.child('accounts').child(auth.uid).child('role').val() == 'admin'"
-    },
-    "quiz": {
-      ".read": "auth != null",
-      ".write": "auth != null && root.child('accounts').child(auth.uid).child('role').val() == 'admin'"
-    },
-    "user_scores": {
-      ".read": "auth != null && root.child('accounts').child(auth.uid).child('role').val() == 'admin'",
-      "lingua-quiz-app": {
-        "users": {
-          "$uid": {
-            ".read": "auth != null && auth.uid == $uid",
-            ".write": "auth != null && auth.uid == $uid"
-          }
-        }
-      }
-    }
-  }
-}
-```
+The security rules live in **`firebase.rules.json`** at the project root. They keep user data isolated: a user can only read and write their own account and score records, while the admin role is assigned manually in the Firebase Console. Users cannot promote themselves.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-lib/
-├── constants.dart               # App constants (quiz app identifier)
-├── firebase_options.dart        # Firebase project configuration
-├── main.dart                    # Entry point & routes
-├── models/
-│   ├── quiz_question.dart       # Quiz question model
-│   └── quiz_result.dart         # Quiz result model
-├── services/
-│   ├── dictionary_service.dart  # Dictionary / translation logic
-│   └── quiz_service.dart        # Quiz fetch & result submission
-└── screens/
-    ├── auth/                    # Slider, login, register, forgot password
-    ├── home/                    # Main dashboard
-    ├── dictionary/              # Vocabulary dictionary
-    ├── translate/               # Translator
-    ├── quiz/                    # Quiz player & question management
-    ├── profile/                 # Profile & logout
-    └── admin/                   # Admin dashboard & user scores
+lingua/
+├── lib/
+│   ├── constants.dart               # App constants (quiz app identifier)
+│   ├── firebase_options.dart        # Firebase project configuration
+│   ├── main.dart                    # Entry point & routes
+│   ├── models/
+│   │   ├── quiz_question.dart       # Quiz question model
+│   │   └── quiz_result.dart         # Quiz result model
+│   ├── services/
+│   │   ├── dictionary_service.dart  # Dictionary & translation logic
+│   │   └── quiz_service.dart        # Quiz fetch & result submission
+│   └── screens/
+│       ├── auth/                    # Slider, login, register, forgot password
+│       ├── home/                    # Main dashboard
+│       ├── dictionary/              # Vocabulary dictionary
+│       ├── translate/               # Translator
+│       ├── quiz/                    # Quiz player & question management
+│       ├── profile/                 # Profile & logout
+│       └── admin/                   # Admin dashboard & user scores
+└── screenshots/                     # Screenshots used in this README
 ```
 
 ---

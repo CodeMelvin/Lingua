@@ -15,16 +15,43 @@ class _TranslatePageState extends State<TranslatePage> {
   final TextEditingController inputController = TextEditingController();
   String translatedText = '';
 
+  List<Map<String, dynamic>> _availableWords = [];
+  bool _loadingWords = true;
+
   final FlutterTts flutterTts = FlutterTts();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableWords();
+  }
+
+  Future<void> _loadAvailableWords() async {
+    try {
+      final entries = await DictionaryService.fetchEntries();
+      if (!mounted) return;
+      setState(() {
+        _availableWords = entries;
+        _loadingWords = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingWords = false);
+    }
+  }
 
   Future<void> speakText(String text) async {
     if (text.trim().isEmpty) return;
 
-    await flutterTts.setLanguage(selectedLang == 'EN → ID' ? "id-ID" : "en-US");
+    try {
+      await flutterTts.setLanguage(
+        selectedLang == 'EN → ID' ? "id-ID" : "en-US",
+      );
 
-    await flutterTts.setSpeechRate(0.5);
-    await flutterTts.setPitch(1.0);
-    await flutterTts.speak(text);
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setPitch(1.0);
+      await flutterTts.speak(text);
+    } catch (_) {}
   }
 
   Future<void> translateWord() async {
@@ -44,7 +71,9 @@ class _TranslatePageState extends State<TranslatePage> {
 
   @override
   void dispose() {
-    flutterTts.stop();
+    try {
+      flutterTts.stop();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -161,6 +190,60 @@ class _TranslatePageState extends State<TranslatePage> {
                 ],
               ),
             ),
+
+            const SizedBox(height: 28),
+
+            const Row(
+              children: [
+                Icon(Icons.menu_book, size: 20, color: Colors.indigo),
+                SizedBox(width: 8),
+                Text(
+                  'Available words',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            if (_loadingWords)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_availableWords.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Text('No words available yet.'),
+              )
+            else
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                constraints: const BoxConstraints(maxHeight: 220),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final item in _availableWords)
+                        Chip(
+                          visualDensity: VisualDensity.compact,
+                          label: Text(
+                            selectedLang == 'EN → ID'
+                                ? '${item['word']} → ${item['meaning']}'
+                                : '${item['meaning']} → ${item['word']}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

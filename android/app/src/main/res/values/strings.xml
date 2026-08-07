@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="google_database_url" translatable="false">https://lingua-a13d2-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+</resources>

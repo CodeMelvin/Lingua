@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,15 +11,19 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? profileImage;
+  Uint8List? profileImage;
 
   Future<void> pickImage(ImageSource source) async {
     final picked = await ImagePicker().pickImage(source: source);
 
     if (picked == null) return;
 
+    final bytes = await picked.readAsBytes();
+
+    if (!mounted) return;
+
     setState(() {
-      profileImage = File(picked.path);
+      profileImage = bytes;
     });
   }
 
@@ -48,33 +52,35 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
 
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.only(top: 64.0, left: 24, right: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                width: 350,
-                height: 200,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 221, 230, 240),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 55,
-                      backgroundImage: profileImage != null
-                          ? FileImage(profileImage!)
-                          : null,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 221, 230, 240),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundImage: profileImage != null
+                            ? MemoryImage(profileImage!)
+                            : null,
                       backgroundColor: Colors.grey.shade400,
                       child: profileImage == null
                           ? const Icon(
@@ -205,6 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

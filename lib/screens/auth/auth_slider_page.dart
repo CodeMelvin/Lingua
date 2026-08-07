@@ -22,7 +22,7 @@ class _AuthSliderState extends State<AuthSlider> {
     );
   }
 
-  BorderRadius _getLoginBorderRadius(bool isActive) {
+  BorderRadius _getLoginBorderRadius() {
     return const BorderRadius.only(
       topLeft: Radius.circular(0),
       bottomLeft: Radius.circular(0),
@@ -101,7 +101,7 @@ class _AuthSliderState extends State<AuthSlider> {
                       decoration: BoxDecoration(
                         color: _pageIndex == 0 ? primaryColor : darkBlue,
 
-                        borderRadius: _getLoginBorderRadius(_pageIndex == 0),
+                        borderRadius: _getLoginBorderRadius(),
                         boxShadow: _pageIndex == 0
                             ? [
                                 BoxShadow(

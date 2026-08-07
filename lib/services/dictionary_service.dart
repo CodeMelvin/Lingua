@@ -6,16 +6,25 @@ class DictionaryService {
   static List<Map<String, dynamic>> parseEntries(Object? raw) {
     final List<Map<String, dynamic>> items = [];
 
-    if (raw is List) {
-      for (final e in raw) {
-        if (e == null) continue;
+    final Iterable entries;
 
-        final item = Map<String, dynamic>.from(e);
-        items.add({
-          'word': item['word'] ?? '',
-          'meaning': item['meaning'] ?? '',
-        });
-      }
+    if (raw is List) {
+      entries = raw;
+    } else if (raw is Map) {
+      entries = raw.values;
+    } else {
+      entries = const [];
+    }
+
+    for (final e in entries) {
+      if (e == null) continue;
+      if (e is! Map) continue;
+
+      final item = Map<String, dynamic>.from(e);
+      items.add({
+        'word': item['word'] ?? '',
+        'meaning': item['meaning'] ?? '',
+      });
     }
 
     return items;
