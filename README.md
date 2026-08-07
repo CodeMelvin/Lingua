@@ -51,11 +51,15 @@ You can also register a new account from the **Register**
 
 ## 🚀 Getting Started
 
-### Option A - Install the APK (fastest)
+### Option A - Try it online (fastest)
+
+Open the live web demo: **[https://lingua-fawn-two.vercel.app](https://lingua-fawn-two.vercel.app)** — no install needed.
+
+### Option B - Install the APK
 
 Download `Lingua-v1.0.0.apk` from the [Releases](../../releases) section and install it on any Android device (Android 8.0+). The app connects to the project's Firebase backend.
 
-### Option B - Run with VS Code
+### Option C - Run with VS Code
 
 1. Install [Flutter](https://docs.flutter.dev/get-started/install) and the **Flutter** extension in VS Code
 2. Open the project folder in VS Code: `File → Open Folder`
@@ -66,13 +70,15 @@ Download `Lingua-v1.0.0.apk` from the [Releases](../../releases) section and ins
 
 > 💡 Lingua is fully cross-platform: Firebase is configured for **Android**, **Web**, **iOS**, and **macOS** (single project). On Android use an emulator/device; for the web version pick Chrome/Edge in VS Code (`flutter run -d chrome`).
 
-### Option C - Build from the command line
+### Option D - Build from the command line
 
 ```bash
 flutter pub get
 flutter run                       # run on a connected device/emulator
 flutter build apk --release       # build the release APK
 ```
+
+> ⚠️ To build against your **own** Firebase backend, add the `--dart-define` flags shown in the next section. A plain build uses placeholder values and will not connect.
 
 ---
 
