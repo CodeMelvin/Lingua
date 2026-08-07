@@ -45,7 +45,7 @@
 |---|---|---|---|
 | User | `demo@lingua.app` | `demo123` | Browse dictionary, take quizzes, view own scores |
 
-You can also register a new account from the **Register** screen (role: user).
+You can also register a new account from the **Register** 
 
 ---
 
