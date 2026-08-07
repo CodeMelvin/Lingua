@@ -53,7 +53,7 @@ You can also register a new account from the **Register**
 
 ### Option A - Try it online (fastest)
 
-Open the live web demo: **[https://lingua-fawn-two.vercel.app](https://lingua-fawn-two.vercel.app)** — no install needed.
+Open the live web demo: **[https://linguadictionary.vercel.app](https://linguadictionary.vercel.app)** — no install needed.
 
 ### Option B - Install the APK
 
