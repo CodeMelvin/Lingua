@@ -92,7 +92,7 @@ The app's Firebase credentials are **not committed** to this repository — they
 2. Create a project at [Firebase Console](https://console.firebase.google.com/) and add an **Android app** with package name `com.codemelvin.lingua`
 3. Run `flutterfire configure` from the project root and select your project — this regenerates `lib/firebase_options.dart` and `android/app/google-services.json` with your values
 4. In **Authentication → Sign-in method**, enable **Email/Password**
-5. In **Realtime Database**, create a database and apply the security rules from [`firebase.rules.json`](firebase.rules.json)
+5. In **Realtime Database**, create a database and configure its security rules in the **Firebase Console**
 6. Optionally import the data (nodes: `language`, `quiz`, `accounts`, `user_scores`) or seed `language`/`quiz` yourself
 
 **Option B — build-time environment variables:**
@@ -105,9 +105,7 @@ flutter build apk --dart-define=FIREBASE_ANDROID_API_KEY=... --dart-define=FIREB
 
 (Web builds use `FIREBASE_WEB_API_KEY` / `FIREBASE_WEB_APP_ID` / `FIREBASE_WEB_MEASUREMENT_ID`.) This keeps credentials out of the source tree entirely — convenient for CI or hosting platforms like Vercel, where secrets live in environment variables.
 
-> **Note:** `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, `macos/Runner/GoogleService-Info.plist`, and `firebase.json` are git-ignored and never pushed.
-
-The security rules live in **`firebase.rules.json`** at the project root. They keep user data isolated: a user can only read and write their own account and score records, while the admin role is assigned manually in the Firebase Console. Users cannot promote themselves.
+> **Note:** `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, `macos/Runner/GoogleService-Info.plist`, `firebase.json`, and `firebase.rules.json` are git-ignored and never pushed.
 
 ---
 
